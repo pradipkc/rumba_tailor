@@ -1,10 +1,8 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, UploadFile, File, Form
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
-import uvicorn
 import os
 import logging
 from pathlib import Path
@@ -29,15 +27,26 @@ db = client[os.environ['DB_NAME']]
 
 # Create the main app
 app = FastAPI()
+# १. CORS Middleware यहाँ थप्नुहोस् (router भन्दा माथि)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://rumba-frontend.onrender.com", 
+        "http://localhost:3000"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+# २. तपाईँको राउटर सेटिङ
 api_router = APIRouter(prefix="/api")
 
-@api_router.get("/")
-def test():
-    return {"message": "API working 🚀"}
+# यहाँ तपाईँको रुटहरू (routes) होलान्...
+# api_router.get("/cart")...
 
-# 👇 VERY IMPORTANT
 app.include_router(api_router)
+
 # JWT Configuration
 JWT_SECRET = os.environ.get("JWT_SECRET")
 JWT_ALGORITHM = "HS256"
